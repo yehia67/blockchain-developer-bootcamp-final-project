@@ -134,23 +134,6 @@ export default function AccountModal({ isOpen, onClose }: Props) {
             </Flex>
           </Box>
         </ModalBody>
-
-        <ModalFooter
-          justifyContent="end"
-          background="gray.700"
-          borderBottomLeftRadius="3xl"
-          borderBottomRightRadius="3xl"
-          p={6}
-        >
-          <Text
-            color="white"
-            textAlign="left"
-            fontWeight="medium"
-            fontSize="md"
-          >
-            Your transactions willl appear here...
-          </Text>
-        </ModalFooter>
       </ModalContent>
     </Modal>
   );
