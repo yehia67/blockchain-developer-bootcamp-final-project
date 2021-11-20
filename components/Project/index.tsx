@@ -1,10 +1,5 @@
-import { Flex, Box, Heading, Text, Button, Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalHeader,
-  ModalBody,
-  ModalCloseButton } from "@chakra-ui/react";
-
+import { Flex, Box, Heading, Text, Button } from "@chakra-ui/react";
+import Img from "next/image";
 import ProgressBar from "@components/ProgressBar";
 
 import styles from "./styles.module.css";
@@ -71,13 +66,12 @@ function Project() {
         </Box>
       </Box>
       <Box p={5}>
-        <img
+        <Img
           className={styles.image}
           src="https://bit.ly/2Z4KKcF"
           alt={"titileeee"}
         />
       </Box>
-
     </Flex>
   );
 }

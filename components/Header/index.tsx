@@ -8,7 +8,6 @@ import {
   useColorModeValue,
   Stack,
   useColorMode,
-  Text,
 } from "@chakra-ui/react";
 import { MoonIcon, SunIcon } from "@chakra-ui/icons";
 import AccountModal from "@components/AccountModal";
