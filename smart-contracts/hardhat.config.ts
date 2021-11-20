@@ -1,12 +1,8 @@
-import * as dotenv from "dotenv";
-
 require('@nomiclabs/hardhat-waffle')
 
 const fs = require('fs')
 const privateKey = fs.readFileSync('privateKey.secret').toString().trim()
 const alchemyKey = fs.readFileSync('alchemyKey.secret').toString().trim()
-
-dotenv.config();
 
 module.exports = {
   solidity: '0.8.10',
