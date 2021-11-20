@@ -16,7 +16,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
   }
 
   return account ? (
-    <Box display="flex" alignItems="center" background="gray.700" py="2">
+    <Box display="flex" alignItems="center" py="2">
       <Box px="3">
         <Text color="white" fontSize="md">
           {etherBalance && parseFloat(formatEther(etherBalance)).toFixed(3)} ETH
@@ -48,11 +48,11 @@ export default function ConnectButton({ handleOpenModal }: Props) {
       </Button>
     </Box>
   ) : (
-    <Box display="flex" alignItems="center" background="gray.700" py="2">
+    <Box display="flex" alignItems="center"  py="2">
       <Button
         onClick={handleConnectWallet}
         fontSize="lg"
-        textColor="white"
+        textColor="black"
         fontWeight="medium"
         borderRadius="xl"
         border="1px solid transparent"
@@ -60,9 +60,7 @@ export default function ConnectButton({ handleOpenModal }: Props) {
           borderColor: "blue.700",
           color: "blue.400",
         }}
-        background="gray.700"
         _active={{
-          backgroundColor: "blue.800",
           borderColor: "blue.700",
         }}
       >
