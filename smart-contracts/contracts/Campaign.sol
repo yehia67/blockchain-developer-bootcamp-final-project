@@ -39,36 +39,57 @@ contract Campaign is Ownable, ICampaign {
     }
 
     /**
-     * @dev Constructor
-     * @param _campaignInfo CampaignInfo
+     * @dev should send a valid wei amount
      */
-    constructor(CampaignInfo memory _campaignInfo) {
-        campaignInfo = CampaignInfo(
-            _campaignInfo.name,
-            _campaignInfo.ipfsHash,
-            _campaignInfo.description,
-            _campaignInfo.state,
-            _campaignInfo.goal,
-            _campaignInfo.deadline,
-            _campaignInfo.amountRaised
-        );
+    modifier isGoalAchived() {
+        require(campaignInfo.amountRaised >= campaignInfo.goal, 'REVERT: campaign need to reach goal');
+        _;
+    }
+
+    /**
+     * @dev Constructor
+     * @param name Campaign name
+     * @param description Campaign description
+     * @param ipfsHash Campaign image in IPFS Hash
+     * @param goal Campaign goal
+     * @param amountRaised Campaign raised amount
+     */
+    constructor(
+        string memory name,
+        string memory description,
+        string memory ipfsHash,
+        uint256 goal,
+        uint256 amountRaised
+    ) {
+        campaignInfo = CampaignInfo(name, description, ipfsHash, CampaignState.ACTIVE, goal, amountRaised);
     }
 
     function fund() external payable isActive {
         funders[_msgSender()] += msg.value;
         campaignInfo.amountRaised += msg.value;
-        emit CampaignFunded(_msgSender(),msg.value);
+        emit CampaignFunded(_msgSender(), msg.value);
     }
 
     function refund() external payable isfunder {
         require(msg.value <= funders[_msgSender()], 'REVERT: You can not refund more than you have');
         funders[_msgSender()] -= msg.value;
         campaignInfo.amountRaised -= msg.value;
-        
-        (bool isSent,) = payable(_msgSender()).call{value: msg.value}(abi.encode(msg.value));
-       
-        require(isSent, "Failed to send Ether");
 
-        emit CampaignRefunded(_msgSender(),msg.value);
+        (bool isSent, ) = payable(_msgSender()).call{value: msg.value}(abi.encode(msg.value));
+
+        require(isSent, 'Failed to send Ether');
+
+        emit CampaignRefunded(_msgSender(), msg.value);
+    }
+
+    function claimFunds() external isActive isGoalAchived onlyOwner {
+        (bool isSent, ) = payable(_msgSender()).call{value: campaignInfo.amountRaised}(
+            abi.encode(campaignInfo.amountRaised)
+        );
+
+        require(isSent, 'Failed to send Ether');
+
+        campaignInfo.state = CampaignState.ENDED;
+        emit CampaignClaimed(_msgSender(), campaignInfo.amountRaised);
     }
 }
