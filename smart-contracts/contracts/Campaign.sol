@@ -15,7 +15,7 @@ contract Campaign is Ownable, ICampaign {
     mapping(address => uint256) funders;
 
     /**
-     * @dev Campaing should be in active state
+     * @dev Campaign should be in active state
      */
     modifier isActive() {
         require(campaignInfo.state == CampaignState.ACTIVE, 'REVERT: Campaign is not active');

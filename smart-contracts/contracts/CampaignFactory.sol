@@ -15,7 +15,7 @@ import './Campaign.sol';
 contract CampaignFactory is Ownable, ICampaignFactory {
     Campaign[] campaigns;
 
-    function createCampaing(
+    function createCampaign(
         string memory name,
         string memory description,
         string memory ipfsHash,

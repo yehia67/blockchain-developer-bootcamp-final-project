@@ -7,7 +7,7 @@ pragma solidity 0.8.10;
  */
 interface ICampaign {
     /**
-     * @dev The campaing status active when it is running, Ended when the deadline is reached
+     * @dev The campaign status active when it is running, Ended when the deadline is reached
      */
     enum CampaignState {
         ACTIVE,
@@ -19,7 +19,7 @@ interface ICampaign {
      * - name: string - The campaign's name
      * - description: string - The campaign's description
      * - ipfsHash: string - The campaign's image in IPFS hash
-     * - state: Campaign - The campaign's state' active when it is running, The campaing status active when it is running, Ended when the deadline is reached
+     * - state: Campaign - The campaign's state' active when it is running, The campaign status active when it is running, Ended when the deadline is reached
      * - goal: uint - The campaign's goal
      */
     struct CampaignInfo {
