@@ -3,7 +3,7 @@
 pragma solidity 0.8.10;
 
 /**
- * @dev Interface of the ERC20 standard as defined in the EIP.
+ * @dev Interface of the Campaign.
  */
 interface ICampaign {
     /**
@@ -28,22 +28,12 @@ interface ICampaign {
         string ipfsHash;
         CampaignState state;
         uint256 goal;
-        uint256 deadline;
         uint256 amountRaised;
     }
     /**
      * events
      */
-    event CampaignCreated(
-        address indexed creator,
-        address indexed campaignAddress,
-        string name,
-        string description,
-        string ipfsHash,
-        uint256 goal,
-        uint256 deadline
-    );
-
     event CampaignFunded(address indexed funder, uint256 amount);
     event CampaignRefunded(address indexed refunder, uint256 amount);
+    event CampaignClaimed(address indexed owner, uint256 amount);
 }
