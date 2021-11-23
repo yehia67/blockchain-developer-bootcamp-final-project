@@ -1,4 +1,4 @@
-require('@nomiclabs/hardhat-waffle')
+import "@nomiclabs/hardhat-waffle";
 
 const fs = require('fs')
 const privateKey = fs.readFileSync('privateKey.secret').toString().trim()
@@ -18,5 +18,11 @@ module.exports = {
       saveDeployments: true,
       accounts: [privateKey],
     },
+  },
+  paths: {
+    sources: './contracts',
+    tests: './test',
+    cache: './cache',
+    artifacts: './artifacts',
   },
 }
