@@ -52,16 +52,14 @@ contract Campaign is Ownable, ICampaign {
      * @param description Campaign description
      * @param ipfsHash Campaign image in IPFS Hash
      * @param goal Campaign goal
-     * @param amountRaised Campaign raised amount
      */
     constructor(
         string memory name,
         string memory description,
         string memory ipfsHash,
-        uint256 goal,
-        uint256 amountRaised
+        uint256 goal
     ) {
-        campaignInfo = CampaignInfo(name, description, ipfsHash, CampaignState.ACTIVE, goal, amountRaised);
+        campaignInfo = CampaignInfo(name, description, ipfsHash, CampaignState.ACTIVE, goal, 0);
     }
 
     function fund() external payable isActive {

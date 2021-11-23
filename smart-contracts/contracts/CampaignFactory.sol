@@ -13,17 +13,44 @@ import './Campaign.sol';
  * @dev Campaign contract
  */
 contract CampaignFactory is Ownable, ICampaignFactory {
-    Campaign[] campaigns;
+    Campaign[] public campaigns;
+    uint256 private minGoal;
+
+    modifier validGoal(uint256 _goal) {
+        require(_goal >= minGoal, 'REVERT: Goal must be greater or equal to the minimum amount');
+        _;
+    }
+
+    constructor(uint256 _minGoal) {
+        minGoal = _minGoal;
+    }
 
     function createCampaign(
         string memory name,
         string memory description,
         string memory ipfsHash,
-        uint256 goal,
-        uint256 amountRaised
-    ) external {
-        Campaign campaign = new Campaign(name, description, ipfsHash, goal, amountRaised);
+        uint256 goal
+    ) external validGoal(goal) {
+        Campaign campaign = new Campaign(name, description, ipfsHash, goal);
         campaigns.push(campaign);
         emit CampaignDeployed(_msgSender(), address(campaign), name, description, ipfsHash, goal);
+    }
+
+    function getDeployedCampaigns() external view returns (Campaign[] memory) {
+        return campaigns;
+    }
+
+    /**
+     * @dev Get the minimum goal for a campaign
+     */
+    function getMinGoal() external view returns (uint256) {
+        return minGoal;
+    }
+
+    /**
+     * @dev Set the minimum goal for a campaign
+     */
+    function setMinGoal(uint256 _minGoal) external onlyOwner {
+        minGoal = _minGoal;
     }
 }

@@ -1,81 +1,77 @@
-const { expect } = require('chai')
-const { ethers } = require('hardhat')
+import chai, { expect } from 'chai'
+import { utils } from 'ethers'
+const { ethers, waffle } = require('hardhat')
+const { solidity } = waffle
 
 interface AccountI {
   address: string
   privateKey: string
 }
-
-describe('Campaign Factory contract', function () {
+chai.use(solidity)
+describe('Campaign Factory contract', () => {
   let CampaignFactory
   let CampaignFactoryContract: any
   let owner: AccountI
   let addr1: AccountI
   let addr2: AccountI
   let addrs: AccountI[]
+  const minGoal = '0.02'
 
   // `beforeEach` will run before each test, re-deploying the contract every
   // time. It receives a callback, which can be async.
-  beforeEach(async function () {
+  before(async () => {
     // Get the ContractFactory and Signers here.
     CampaignFactory = await ethers.getContractFactory('CampaignFactory')
     ;[owner, addr1, addr2, ...addrs] = await ethers.getSigners()
-    CampaignFactoryContract = await CampaignFactory.deploy()
+    CampaignFactoryContract = await CampaignFactory.deploy(utils.parseEther(minGoal))
   })
 
-  describe('Deployment', function () {
-    it('Should set the right owner', async function () {
+  describe('Deployment', () => {
+    it('Should set the right owner', async () => {
       expect(await CampaignFactoryContract.owner()).to.equal(owner.address)
     })
-
-    it('Should create campaign', async function () {
-      await CampaignFactoryContract.createCampaign
+    it(`Should set the min goal to ${minGoal} ETH`, async () => {
+      expect(await CampaignFactoryContract.getMinGoal()).to.equal(utils.parseEther(minGoal))
     })
   })
 
-  describe('Transactions', function () {
-    it('Should transfer tokens between accounts', async function () {
-      // Transfer 50 tokens from owner to addr1
-      await hardhatToken.transfer(addr1.address, 50)
-      const addr1Balance = await hardhatToken.balanceOf(addr1.address)
-      expect(addr1Balance).to.equal(50)
-
-      // Transfer 50 tokens from addr1 to addr2
-      // We use .connect(signer) to send a transaction from another account
-      await hardhatToken.connect(addr1).transfer(addr2.address, 50)
-      const addr2Balance = await hardhatToken.balanceOf(addr2.address)
-      expect(addr2Balance).to.equal(50)
+  describe('Transactions', () => {
+    it(`Should set the min goal to 0.03 ETH`, async () => {
+      await CampaignFactoryContract.setMinGoal(utils.parseEther('0.03'))
+      expect(await CampaignFactoryContract.getMinGoal()).to.equal(utils.parseEther('0.03'))
     })
 
-    it('Should fail if sender doesn’t have enough tokens', async function () {
-      const initialOwnerBalance = await hardhatToken.balanceOf(owner.address)
-
-      // Try to send 1 token from addr1 (0 tokens) to owner (1000000 tokens).
-      // `require` will evaluate false and revert the transaction.
-      await expect(hardhatToken.connect(addr1).transfer(owner.address, 1)).to.be.revertedWith('Not enough tokens')
-
-      // Owner balance shouldn't have changed.
-      expect(await hardhatToken.balanceOf(owner.address)).to.equal(initialOwnerBalance)
+    it('Should create campaign with goal 1 ETH', async () => {
+      await expect(
+        CampaignFactoryContract.createCampaign('new campaign', 'description', 'ipfs hash', utils.parseEther('1'))
+      )
+        .to.emit(CampaignFactoryContract, 'CampaignDeployed')
+        .withArgs(
+          owner.address,
+          (
+            await CampaignFactoryContract.getDeployedCampaigns()
+          )[0],
+          'new campaign',
+          'description',
+          'ipfs hash',
+          utils.parseEther('1')
+        )
     })
 
-    it('Should update balances after transfers', async function () {
-      const initialOwnerBalance = await hardhatToken.balanceOf(owner.address)
+    it('Should revert for campaign with goal 0.001 ETH', async () => {
+      await expect(
+        CampaignFactoryContract.createCampaign('new campaign', 'description', 'ipfs hash', utils.parseEther('0.001'))
+      ).to.revertedWith('REVERT: Goal must be greater or equal to the minimum amount')
+    })
 
-      // Transfer 100 tokens from owner to addr1.
-      await hardhatToken.transfer(addr1.address, 100)
+    it('Should deploy three campaigns', async () => {
+      await Promise.all([
+        CampaignFactoryContract.createCampaign('new campaign 1', 'description', 'ipfs hash', utils.parseEther('1.2')),
+        CampaignFactoryContract.createCampaign('new campaign 2', 'description', 'ipfs hash', utils.parseEther('8.2')),
+        CampaignFactoryContract.createCampaign('new campaign 3', 'description', 'ipfs hash', utils.parseEther('6.2')),
+      ])
 
-      // Transfer another 50 tokens from owner to addr2.
-      await hardhatToken.transfer(addr2.address, 50)
-
-      // Check balances.
-      const finalOwnerBalance = await hardhatToken.balanceOf(owner.address)
-      expect(finalOwnerBalance).to.equal(initialOwnerBalance - 150)
-
-      const addr1Balance = await hardhatToken.balanceOf(addr1.address)
-      expect(addr1Balance).to.equal(100)
-
-      const addr2Balance = await hardhatToken.balanceOf(addr2.address)
-      expect(addr2Balance).to.equal(50)
+      expect((await CampaignFactoryContract.getDeployedCampaigns()).length).to.equal(4)
     })
   })
 })
