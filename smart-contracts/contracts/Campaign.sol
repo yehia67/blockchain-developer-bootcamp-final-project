@@ -72,13 +72,13 @@ contract Campaign is Context, ICampaign {
         campaignInfo = CampaignInfo(owner,name, description, ipfsHash, CampaignState.ACTIVE, goal, 0);
     }
 
-    function fund() external payable isActive {
+    function fund() external payable isActive isValidWeiAmount {
         funders[_msgSender()] += msg.value;
         campaignInfo.amountRaised += msg.value;
         emit CampaignFunded(_msgSender(), msg.value);
     }
 
-    function refund() external payable isfunder {
+    function refund() external payable isfunder isValidWeiAmount {
         require(msg.value <= funders[_msgSender()], 'REVERT: You can not refund more than you have');
         funders[_msgSender()] -= msg.value;
         campaignInfo.amountRaised -= msg.value;
