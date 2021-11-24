@@ -64,14 +64,28 @@ describe('Campaign Factory contract', () => {
       ).to.revertedWith('REVERT: Goal must be greater or equal to the minimum amount')
     })
 
-    it('Should deploy three campaigns', async () => {
+    it('Should deploy four campaigns one already created and three should been deployed', async () => {
       await Promise.all([
         CampaignFactoryContract.createCampaign('new campaign 1', 'description', 'ipfs hash', utils.parseEther('1.2')),
         CampaignFactoryContract.createCampaign('new campaign 2', 'description', 'ipfs hash', utils.parseEther('8.2')),
         CampaignFactoryContract.createCampaign('new campaign 3', 'description', 'ipfs hash', utils.parseEther('6.2')),
       ])
-
       expect((await CampaignFactoryContract.getDeployedCampaigns()).length).to.equal(4)
+    })
+
+    it('Should check the real owner of the campaign', async () => {
+      expect(
+        await CampaignFactoryContract.connect(addr1).createCampaign(
+          'new campaign of new owner',
+          'description of new owner',
+          'ipfs hash new owner',
+          utils.parseEther('3')
+        )
+      ).to.emit(CampaignFactoryContract, 'CampaignDeployed')
+      const campaigns = await CampaignFactoryContract.getDeployedCampaigns()
+      const campaign = (await ethers.getContractFactory('Campaign')).attach(campaigns[campaigns.length - 1])
+      const campaignInfo = await campaign.campaignInfo()
+      expect(campaignInfo.owner).to.equal(addr1.address)
     })
   })
 })

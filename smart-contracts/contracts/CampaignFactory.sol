@@ -31,7 +31,7 @@ contract CampaignFactory is Ownable, ICampaignFactory {
         string memory ipfsHash,
         uint256 goal
     ) external validGoal(goal) {
-        Campaign campaign = new Campaign(name, description, ipfsHash, goal);
+        Campaign campaign = new Campaign(_msgSender(), name, description, ipfsHash, goal);
         campaigns.push(campaign);
         emit CampaignDeployed(_msgSender(), address(campaign), name, description, ipfsHash, goal);
     }

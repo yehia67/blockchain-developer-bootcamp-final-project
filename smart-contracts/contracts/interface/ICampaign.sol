@@ -23,6 +23,7 @@ interface ICampaign {
      * - goal: uint - The campaign's goal
      */
     struct CampaignInfo {
+        address owner;
         string name;
         string description;
         string ipfsHash;
