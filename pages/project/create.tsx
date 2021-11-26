@@ -1,45 +1,60 @@
 import { Box, ButtonGroup } from "@chakra-ui/react";
-import { uploadIPFS } from "@frameworks/ipfs/ipfs";
 import { Formik } from "formik";
+import { useEthers } from "@usedapp/core";
+import type { Web3Provider } from "@ethersproject/providers";
+
 import {
   InputControl,
   NumberInputControl,
-  PercentComplete,
   ResetButton,
-  SelectControl,
   SubmitButton,
   TextareaControl,
 } from "formik-chakra-ui";
 import * as React from "react";
 import * as Yup from "yup";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+import { uploadIPFS } from "@frameworks/ipfs/ipfs";
+import { createCampaign } from "@services/smartContracts";
+
+interface CreateFormI {
+  projectName: string;
+  description: string;
+  ethAmount: number;
+}
 
 const initialValues = {
   projectName: "",
   description: "",
   ethAmount: 0,
   projectImage: "",
-  duration: "",
 };
 const validationSchema = Yup.object({
   projectName: Yup.string().required(),
   description: Yup.string().required(),
-  ethAmount: Yup.number().required().min(0).max(120),
-  duration: Yup.string().required(),
+  ethAmount: Yup.number().required().min(0),
   projectImage: Yup.object().nullable(),
 });
 
 const Create = () => {
   const [ipfsHash, setIpfsHash] = React.useState("");
-  const onSubmit = (values: React.FormEvent) => {
-    sleep(300).then(() => {
-      window.alert(JSON.stringify({ ipfsHash, ...values }, null, 2));
-    });
+  const { account, library, activateBrowserWallet } = useEthers();
+
+  const onSubmit = async (values: CreateFormI) => {
+    if (!account || account.length === 0 || typeof library === "undefined") {
+      activateBrowserWallet();
+    }
+    await createCampaign(
+      {
+        name: values.projectName,
+        description: values.description,
+        ipfsHash,
+        goal: `${values.ethAmount}`,
+      },
+      { userAddress: `${account}`, provider: library as Web3Provider }
+    );
   };
   return (
     <Formik
-      // @ts-ignore
       initialValues={initialValues}
       onSubmit={onSubmit}
       validationSchema={validationSchema}
@@ -88,28 +103,10 @@ const Create = () => {
             label="Amount of ETH that you need (max 120)"
           />
 
-          <SelectControl
-            label="Project Duration"
-            name="duration"
-            selectProps={{ placeholder: "Select option" }}
-          >
-            <option value="1">One Month</option>
-            <option value="3">Three Month</option>
-            <option value="6">Six Month</option>
-            <option value="12">Years</option>
-          </SelectControl>
-
-          <PercentComplete />
-          <ButtonGroup>
-            <SubmitButton>Submit</SubmitButton>
+          <ButtonGroup mt={5}>
+            <SubmitButton loadingText={"Connecting.."}>Submit</SubmitButton>
             <ResetButton>Reset</ResetButton>
           </ButtonGroup>
-
-          <Box as="pre" marginY={10}>
-            {JSON.stringify(values, null, 2)}
-            <br />
-            {JSON.stringify(errors, null, 2)}
-          </Box>
         </Box>
       )}
     </Formik>

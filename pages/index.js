@@ -1,11 +1,13 @@
 import React from "react";
 
 import { Grid } from "@chakra-ui/react";
-import { Link } from "@chakra-ui/react";
+import { Link, Spinner } from "@chakra-ui/react";
+import { useEthers } from "@usedapp/core";
+import { ethers } from "ethers";
 
 import Card from "@components/Card";
-import { getCampaigns, createCampaign } from "@services/smartContracts";
-import { useEthers } from "@usedapp/core";
+import { getCampaigns } from "@services/smartContracts";
+
 const projects = [
   {
     id: 1,
@@ -47,6 +49,7 @@ const projects = [
 export default function Home() {
   const { library, account } = useEthers();
   const [provider, setProvider] = React.useState();
+  const [campaigns, setCampaigns] = React.useState([]);
 
   const networkHandler = React.useCallback(async () => {
     try {
@@ -68,7 +71,8 @@ export default function Home() {
   }, []);
 
   const handleGetCampaigns = React.useCallback(async (library) => {
-    const campaigns = await getCampaigns(library);
+    const newCampaigns = await getCampaigns(library);
+    setCampaigns(newCampaigns);
     console.log({ campaigns });
   }, []);
 
@@ -85,72 +89,36 @@ export default function Home() {
     }
   }, [provider, account, networkHandler]);
 
-  const handleCreateCampaign = async () => {
-    Promise.all(
-      createCampaign(
-        {
-          name: "Campaign 5",
-          description: "Campaign Description 5",
-          ipfsHash: "ipfs hash 5",
-          goal: "12",
-        },
-        { userAddress: account, provider }
-      ),
-      createCampaign(
-        {
-          name: "Campaign 6",
-          description: "Campaign Description 6",
-          ipfsHash: "ipfs hash 6",
-          goal: "20",
-        },
-        { userAddress: account, provider }
-      ),
-      createCampaign(
-        {
-          name: "Campaign 7",
-          description: "Campaign Description 7",
-          ipfsHash: "ipfs hash 7",
-          goal: "15",
-        },
-        { userAddress: account, provider }
-      ),
-      createCampaign(
-        {
-          name: "Campaign 8",
-          description: "Campaign Description 8",
-          ipfsHash: "ipfs hash 8",
-          goal: "8.4",
-        },
-        { userAddress: account, provider }
-      ),
-      createCampaign(
-        {
-          name: "Campaign 9",
-          description: "Campaign Description 9",
-          ipfsHash: "ipfs hash 9",
-          goal: "17",
-        },
-        { userAddress: account, provider }
-      ),
-      createCampaign(
-        {
-          name: "Campaign 10",
-          description: "Campaign Description 10",
-          ipfsHash: "ipfs hash 10",
-          goal: "5.5",
-        },
-        { userAddress: account, provider }
-      )
-    );
-  };
   return (
     <Grid templateColumns="repeat(4, 1fr)" gap={3}>
-      {projects.map((project) => (
-        <Link key={`project/${project.id}`} href={`project/${project.id}`}>
-          <Card project={project} />
-          <button onClick={handleCreateCampaign}>Create Campaign</button>
-        </Link>
-      ))}
+      {campaigns.length === 0 ? (
+        <Spinner
+          display="flex"
+          thickness="4px"
+          speed="0.65s"
+          emptyColor="gray.200"
+          color="blue.500"
+          size="xl"
+        />
+      ) : (
+        campaigns.map((campaignArray) => (
+          <Link
+            key={`project/${campaignArray[0]}`}
+            href={`project/${campaignArray[0]}`}
+          >
+            <Card
+              name={campaignArray[1]}
+              ipfsHash={campaignArray[3]}
+              goal={Number(
+                ethers.utils.formatEther(campaignArray[5].toString())
+              )}
+              raisedAmount={Number(
+                ethers.utils.formatEther(campaignArray[6].toString())
+              )}
+            />
+          </Link>
+        ))
+      )}
     </Grid>
   );
 }
