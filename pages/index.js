@@ -3,49 +3,10 @@ import React from "react";
 import { Grid } from "@chakra-ui/react";
 import { Link, Spinner } from "@chakra-ui/react";
 import { useEthers } from "@usedapp/core";
-import { ethers } from "ethers";
 
 import Card from "@components/Card";
 import { getCampaigns } from "@services/smartContracts";
 
-const projects = [
-  {
-    id: 1,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-  {
-    id: 2,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-  {
-    id: 3,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-  {
-    id: 4,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-  {
-    id: 5,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-  {
-    id: 6,
-    collected: 10,
-    goal: 20,
-    max: 100,
-  },
-];
 export default function Home() {
   const { library, account } = useEthers();
   const [provider, setProvider] = React.useState();
@@ -73,7 +34,7 @@ export default function Home() {
   const handleGetCampaigns = React.useCallback(async (library) => {
     const newCampaigns = await getCampaigns(library);
     setCampaigns(newCampaigns);
-    console.log({ campaigns });
+    console.log({ newCampaigns });
   }, []);
 
   React.useEffect(() => {
@@ -101,20 +62,16 @@ export default function Home() {
           size="xl"
         />
       ) : (
-        campaigns.map((campaignArray) => (
+        campaigns.map((campaign) => (
           <Link
-            key={`project/${campaignArray[0]}`}
-            href={`project/${campaignArray[0]}`}
+            key={`campaign/${campaign.contractAddress}`}
+            href={`campaign/${campaign.contractAddress}`}
           >
             <Card
-              name={campaignArray[1]}
-              ipfsHash={campaignArray[3]}
-              goal={Number(
-                ethers.utils.formatEther(campaignArray[5].toString())
-              )}
-              raisedAmount={Number(
-                ethers.utils.formatEther(campaignArray[6].toString())
-              )}
+              name={campaign.info.name}
+              ipfsHash={campaign.info.ipfsHash}
+              goal={campaign.info.goal}
+              raisedAmount={campaign.info.amountRaised}
             />
           </Link>
         ))

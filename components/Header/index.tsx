@@ -39,7 +39,7 @@ export default function Nav() {
             <NavLink href="/">
               <span>Home</span>
             </NavLink>
-            <NavLink href="/project/create">
+            <NavLink href="/campaign/create">
               <span>Create Project</span>
             </NavLink>
             <Button onClick={toggleColorMode} margin={3}>
