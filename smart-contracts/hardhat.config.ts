@@ -1,4 +1,4 @@
-import "@nomiclabs/hardhat-waffle";
+import '@nomiclabs/hardhat-waffle'
 
 const fs = require('fs')
 const privateKey = fs.readFileSync('privateKey.secret').toString().trim()
@@ -17,6 +17,7 @@ module.exports = {
       url: `https://eth-ropsten.alchemyapi.io/v2/${alchemyKey}`,
       saveDeployments: true,
       accounts: [privateKey],
+      gasPrice: 8000000000,
     },
   },
   paths: {
