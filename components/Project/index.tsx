@@ -69,7 +69,9 @@ function Project() {
         <Img
           className={styles.image}
           src="https://bit.ly/2Z4KKcF"
-          alt={"titileeee"}
+          alt={"title"}
+          width="500"
+          height="300"
         />
       </Box>
     </Flex>
