@@ -18,6 +18,8 @@
     "paths": {
       "@styles/*": ["styles/*"],
       "@content/*": ["content/*"],
+      "@artifacts/*": ["artifacts/*"],
+      "@services/*": ["services/*"],
       "@blockchain/*": ["blockchain/*"],
       "@components/*": ["components/*"],
       "@frameworks/*": ["frameworks/*"],
