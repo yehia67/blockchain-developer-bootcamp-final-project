@@ -60,6 +60,8 @@ function Campaign({
   const [fundAmount, setFundAmount] = React.useState("0");
   const [transactionHash, setTransactionHash] = React.useState("");
   const [currentUserFunding, setCurrentUserFunding] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleUserCurrentFunding = async () => {
     if (!account || !library) {
       return;
@@ -90,8 +92,10 @@ function Campaign({
         await handleUserCurrentFunding();
         const newCampaignInfo = await getCampaignInfo(contractAddress);
         if (!newCampaignInfo) {
+          setIsLoading(false);
           return;
         }
+        setIsLoading(false);
         setCampaignInfo({
           raisedAmount: newCampaignInfo.info.amountRaised,
           status: newCampaignInfo.info.status,
@@ -104,36 +108,51 @@ function Campaign({
 
   const handleFund = async () => {
     if (!account || !library) {
+      toast.error("Connect To Metamask Please");
       return;
     }
+    setIsLoading(true);
     const hash = await fund(fundAmount, {
       userAddress: account as string,
       provider: library as Web3Provider,
       contractAddress,
     });
+    if (!hash) {
+      setIsLoading(false);
+    }
     setTransactionHash(hash);
   };
   const handleClaimFund = async () => {
     if (!account || !library) {
+      toast.error("Connect To Metamask Please");
       return;
     }
+    setIsLoading(true);
     const hash = await claimFunds({
       userAddress: account as string,
       provider: library as Web3Provider,
       contractAddress,
     });
+    if (!hash) {
+      setIsLoading(false);
+    }
     setTransactionHash(hash);
   };
 
   const handleRefund = async () => {
     if (!account || !library) {
+      toast.error("Connect To Metamask Please");
       return;
     }
+    setIsLoading(true);
     const hash = await refund({
       userAddress: account as string,
       provider: library as Web3Provider,
       contractAddress,
     });
+    if (!hash) {
+      setIsLoading(false);
+    }
     setTransactionHash(hash);
   };
 
@@ -259,6 +278,7 @@ function Campaign({
               <Text mr="8px">&#128239;</Text> Claim Funds
             </Button>
           )}
+          {isLoading && <Spinner m={5} />}
         </Box>
       </Box>
 
