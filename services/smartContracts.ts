@@ -56,8 +56,7 @@ export const getCampaignInfo = async (
       },
     };
   } catch (error) {
-    console.log("the error here");
-    console.log(error);
+    console.error(error);
   }
 };
 
@@ -139,10 +138,10 @@ export const fund = async (
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -168,10 +167,10 @@ export const refund = async ({
     return refund.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -197,10 +196,10 @@ export const claimFunds = async ({
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -217,7 +216,7 @@ export const getUserFundsAmount = async ({
       return;
     }
     const contract = new Contract(contractAddress, Campaign.abi, provider);
-    const funds = await contract.getFunds();
+    const funds = await contract.connect(userAddress).getFunds();
     return Number(ethers.utils.formatEther(funds.toString()));
   } catch (error) {
     console.error(error);

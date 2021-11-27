@@ -60,7 +60,6 @@ function Campaign({
   const [fundAmount, setFundAmount] = React.useState("0");
   const [transactionHash, setTransactionHash] = React.useState("");
   const [currentUserFunding, setCurrentUserFunding] = React.useState(0);
-
   const handleUserCurrentFunding = async () => {
     if (!account || !library) {
       return;
@@ -70,7 +69,7 @@ function Campaign({
       provider: library,
       contractAddress,
     });
-    if (userFunding) {
+    if (userFunding || userFunding === 0) {
       setCurrentUserFunding(userFunding);
     }
   };
@@ -88,7 +87,7 @@ function Campaign({
       if (transactionHash && transactionHash.length > 0 && library) {
         // wait for transaction to confirm
         await library.waitForTransaction(transactionHash);
-        handleUserCurrentFunding();
+        await handleUserCurrentFunding();
         const newCampaignInfo = await getCampaignInfo(contractAddress);
         if (!newCampaignInfo) {
           return;
@@ -144,23 +143,6 @@ function Campaign({
         >
           {name}
         </Heading>
-        <Text
-          fontSize={["1rem", "1rem", "1.2rem", "1.3rem"]}
-          marginBottom="2.5rem"
-          fontWeight="400"
-          padding="1rem"
-        >
-          {description}
-        </Text>
-      </Box>
-      <Box p={5}>
-        <Img
-          className={styles.image}
-          src={`https://ipfs.io/ipfs/${ipfsHash}`}
-          alt="Image of funded project"
-          width="700px"
-          height="500px"
-        />
         <Stack direction="row" spacing="1.5rem" margin="1rem">
           {status === "Funding" && <Badge colorScheme="green">Active</Badge>}
           {status === "Ended" && (
@@ -174,6 +156,14 @@ function Campaign({
           </Badge>
           <Badge colorScheme="purple"> {goal} ETH Campaign Goal </Badge>
         </Stack>
+        <Text
+          fontSize={["1rem", "1rem", "1.2rem", "1.3rem"]}
+          marginBottom="2.5rem"
+          fontWeight="400"
+          padding="1rem"
+        >
+          {description}
+        </Text>
         <Box display="flex" p={1} m={1} alignItems="center">
           {campaignInfo.status === "Ended" ? (
             <Text>Campaign Ended</Text>
@@ -185,21 +175,27 @@ function Campaign({
             />
           )}
         </Box>
-        <Box display="flex" p={1} alignItems="center">
-          <NumberInput
-            defaultValue={fundAmount}
-            min={0}
-            onChange={(valueAsString: string, valueAsNumber: number) =>
-              setFundAmount(valueAsString)
-            }
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </Box>
+
+        {status !== "Ended" && (
+          <Box display="flex" p={1} alignItems="center">
+            <Text m={1} p={1}>
+              Amount You Want To Fund
+            </Text>
+            <NumberInput
+              defaultValue={fundAmount}
+              min={0}
+              onChange={(valueAsString: string, valueAsNumber: number) =>
+                setFundAmount(valueAsString)
+              }
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        )}
         <Box m={1} flexDirection={["column", "column", "row", "row"]} d="flex">
           <Button
             m={1}
@@ -253,6 +249,16 @@ function Campaign({
             </Button>
           )}
         </Box>
+      </Box>
+
+      <Box p={5}>
+        <Img
+          className={styles.image}
+          src={`https://ipfs.io/ipfs/${ipfsHash}`}
+          alt="Image of funded project"
+          width="700px"
+          height="500px"
+        />
       </Box>
     </Flex>
   ) : (
