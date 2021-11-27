@@ -64,40 +64,27 @@ describe('Campaign contract', () => {
         .withArgs(addr1.address, utils.parseEther('0.06'))
     })
 
+    it(`Should get the funded amount`, async () => {
+      const test = await await CampaignContract.connect(addr1).getFunds()
+      expect(await CampaignContract.connect(addr1).getFunds()).to.equal(utils.parseEther('0.06'))
+    })
+
     it(`Should revert fund campaign with zero value`, async () => {
       await expect(CampaignContract.connect(addr1).fund({ value: utils.parseEther('0') })).to.be.revertedWith(
         'REVERT: The amount of wei should be more than zero'
       )
     })
     it(`Should refund all campaign funds`, async () => {
-      expect(await CampaignContract.connect(addr1).refund({ value: utils.parseEther('0.06') }))
+      const balanceBefore = await ethers.provider.getBalance(addr1.address)
+      expect(await CampaignContract.connect(addr1).refund())
         .to.emit(CampaignContract, 'CampaignRefunded')
         .withArgs(addr1.address, utils.parseEther('0.06'))
-    })
-
-    it(`Should refund partially campaign`, async () => {
-      expect(await CampaignContract.connect(addr1).fund({ value: utils.parseEther('0.06') }))
-        .to.emit(CampaignContract, 'CampaignFunded')
-        .withArgs(addr1.address, utils.parseEther('0.06'))
-      expect(await CampaignContract.connect(addr1).refund({ value: utils.parseEther('0.02') }))
-        .to.emit(CampaignContract, 'CampaignRefunded')
-        .withArgs(addr1.address, utils.parseEther('0.02'))
-    })
-
-    it(`Should revert refund more than the campaign fund`, async () => {
-      expect(await CampaignContract.connect(addr2).fund({ value: utils.parseEther('0.06') }))
-        .to.emit(CampaignContract, 'CampaignFunded')
-        .withArgs(addr2.address, utils.parseEther('0.06'))
-
-      await expect(CampaignContract.connect(addr2).refund({ value: utils.parseEther('1') })).to.be.revertedWith(
-        'REVERT: You can not refund more than you have'
-      )
+      const balanceAfter = await ethers.provider.getBalance(addr1.address)
+      expect(Number(balanceAfter.sub(balanceBefore)) > 0).to.be.true
     })
 
     it(`Should revert you are not a funder`, async () => {
-      await expect(CampaignContract.connect(owner).refund({ value: utils.parseEther('0.02') })).to.revertedWith(
-        'REVERT: You are not a funder'
-      )
+      await expect(CampaignContract.connect(owner).refund()).to.revertedWith('REVERT: You are not a funder')
     })
 
     it(`Should revert if claim before the goal is reached`, async () => {

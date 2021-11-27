@@ -1,7 +1,7 @@
 {
-  "address": "0x4e5273Daa5351d2501B467E8E94B75D9b5336B08",
+  "address": "0x4c69eE92a9298d71db3091d68B6b8e0a3Fa89F81",
   "contractName": "CampaignFactory",
-  "abi": [
+ "abi": [
     {
       "inputs": [
         {

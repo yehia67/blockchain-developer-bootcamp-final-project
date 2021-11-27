@@ -3,6 +3,7 @@
 pragma solidity 0.8.10;
 
 import '@openzeppelin/contracts/utils/Context.sol';
+import '@openzeppelin/contracts/utils/Address.sol';
 
 import './interface/ICampaign.sol';
 
@@ -11,9 +12,10 @@ import './interface/ICampaign.sol';
  * @dev Campaign contract
  */
 contract Campaign is Context, ICampaign {
+    using Address for address payable;
+
     CampaignInfo public campaignInfo;
     mapping(address => uint256) funders;
-
 
     /**
      * @dev only campaign owner can call this function
@@ -69,35 +71,38 @@ contract Campaign is Context, ICampaign {
         string memory ipfsHash,
         uint256 goal
     ) {
-        campaignInfo = CampaignInfo(owner,name, description, ipfsHash, CampaignState.ACTIVE, goal, 0);
+        campaignInfo = CampaignInfo(owner, name, description, ipfsHash, CampaignState.ACTIVE, goal, 0);
     }
 
-    function fund() external payable isActive isValidWeiAmount {
+    fallback() external payable {
+        revert();
+    }
+
+    receive() external payable {
+        fund();
+    }
+
+    function fund() public payable isActive isValidWeiAmount {
         funders[_msgSender()] += msg.value;
         campaignInfo.amountRaised += msg.value;
         emit CampaignFunded(_msgSender(), msg.value);
     }
 
-    function refund() external payable isfunder isValidWeiAmount {
-        require(msg.value <= funders[_msgSender()], 'REVERT: You can not refund more than you have');
-        funders[_msgSender()] -= msg.value;
-        campaignInfo.amountRaised -= msg.value;
+    function refund() external isfunder {
+        campaignInfo.amountRaised -= funders[_msgSender()];
+        payable(_msgSender()).transfer(funders[_msgSender()]);
 
-        (bool isSent, ) = payable(_msgSender()).call{value: msg.value}(abi.encode(msg.value));
-
-        require(isSent, 'Failed to send Ether');
-
-        emit CampaignRefunded(_msgSender(), msg.value);
+        emit CampaignRefunded(_msgSender(), funders[_msgSender()]);
     }
 
     function claimFunds() external isActive isGoalAchived onlyOwner {
-        (bool isSent, ) = payable(_msgSender()).call{value: campaignInfo.amountRaised}(
-            abi.encode(campaignInfo.amountRaised)
-        );
-
-        require(isSent, 'Failed to send Ether');
-
         campaignInfo.state = CampaignState.ENDED;
+        payable(_msgSender()).transfer(campaignInfo.amountRaised);
+
         emit CampaignClaimed(_msgSender(), campaignInfo.amountRaised);
+    }
+
+    function getFunds() external view returns (uint256) {
+        return funders[_msgSender()];
     }
 }
