@@ -1,24 +1,31 @@
-// Sample card from Airbnb
-import { Image, Box } from "@chakra-ui/react";
+import { Image, Box, Text } from "@chakra-ui/react";
 import ProgressBar from "@components/ProgressBar";
 interface CardProps {
   name: string;
   goal: number;
   raisedAmount: number;
   ipfsHash: string;
+  status: string;
 }
 export default function Card({
   name,
   goal,
   raisedAmount,
   ipfsHash,
+  status,
 }: CardProps) {
   return (
-    <Box maxW="sm" borderWidth="1px" m={2} borderRadius="lg" overflow="hidden">
+    <Box
+      borderWidth="1px"
+      m={2}
+      borderRadius="lg"
+      overflow="hidden"
+      height="20rem"
+    >
       <Image
         p={5}
         width={"100%"}
-        height={"100%"}
+        height={"10rem"}
         src={`https://ipfs.io/ipfs/${ipfsHash}`}
         alt="Image of funded project"
       />
@@ -83,8 +90,12 @@ export default function Card({
           </svg>
         </Box>
 
-        <Box display="flex" mt="2" alignItems="center">
-          <ProgressBar collected={raisedAmount} goal={goal} max={100} />
+        <Box display="flex" mt="2" alignItems="center" height="5rem">
+          {status === "Ended" ? (
+            <Text>Campaign Ended</Text>
+          ) : (
+            <ProgressBar collected={raisedAmount} goal={goal} max={100} />
+          )}
         </Box>
       </Box>
     </Box>

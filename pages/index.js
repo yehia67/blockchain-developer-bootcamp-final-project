@@ -62,7 +62,7 @@ export default function Home() {
           size="xl"
         />
       ) : (
-        campaigns.map((campaign) => (
+        campaigns.slice(0).reverse().map((campaign) => (
           <Link
             key={`campaign/${campaign.contractAddress}`}
             href={`campaign/${campaign.contractAddress}`}
@@ -72,6 +72,7 @@ export default function Home() {
               ipfsHash={campaign.info.ipfsHash}
               goal={campaign.info.goal}
               raisedAmount={campaign.info.amountRaised}
+              status={campaign.info.status}
             />
           </Link>
         ))

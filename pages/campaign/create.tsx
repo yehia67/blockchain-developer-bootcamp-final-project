@@ -104,7 +104,7 @@ const Create = () => {
           />
 
           <ButtonGroup mt={5}>
-            <SubmitButton loadingText={"Connecting.."}>Submit</SubmitButton>
+            <SubmitButton loadingText={"Tx Pending.."}>Submit</SubmitButton>
             <ResetButton>Reset</ResetButton>
           </ButtonGroup>
         </Box>
