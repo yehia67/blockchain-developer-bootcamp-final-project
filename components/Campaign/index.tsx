@@ -113,6 +113,17 @@ function Campaign({
     });
     setTransactionHash(hash);
   };
+  const handleClaimFund = async () => {
+    if (!account || !library) {
+      return;
+    }
+    const hash = await claimFunds({
+      userAddress: account as string,
+      provider: library as Web3Provider,
+      contractAddress,
+    });
+    setTransactionHash(hash);
+  };
 
   const handleRefund = async () => {
     if (!account || !library) {
@@ -144,8 +155,10 @@ function Campaign({
           {name}
         </Heading>
         <Stack direction="row" spacing="1.5rem" margin="1rem">
-          {status === "Funding" && <Badge colorScheme="green">Active</Badge>}
-          {status === "Ended" && (
+          {campaignInfo.status === "Funding" && (
+            <Badge colorScheme="green">Active</Badge>
+          )}
+          {campaignInfo.status === "Ended" && (
             <Badge colorScheme="purple">Campaign Ended</Badge>
           )}
           {owner === account && (
@@ -176,7 +189,7 @@ function Campaign({
           )}
         </Box>
 
-        {status !== "Ended" && (
+        {campaignInfo.status !== "Ended" && (
           <Box display="flex" p={1} alignItems="center">
             <Text m={1} p={1}>
               Amount You Want To Fund
@@ -207,7 +220,9 @@ function Campaign({
               color: "white",
             }}
             onClick={() => handleRefund()}
-            disabled={status === "Ended" || currentUserFunding === 0}
+            disabled={
+              campaignInfo.status === "Ended" || currentUserFunding === 0
+            }
           >
             <Text mr="8px">&#9889;</Text>
             Refund
@@ -222,7 +237,7 @@ function Campaign({
               color: "white",
             }}
             onClick={() => handleFund()}
-            disabled={status === "Ended"}
+            disabled={campaignInfo.status === "Ended"}
           >
             <Text mr="8px">&#128239;</Text> Fund
           </Button>
@@ -236,14 +251,10 @@ function Campaign({
                 backgroundColor: "orange.500",
                 color: "white",
               }}
-              onClick={() =>
-                claimFunds({
-                  userAddress: account as string,
-                  provider: library as Web3Provider,
-                  contractAddress,
-                })
-              }
-              disabled={status === "Ended"}
+              onClick={() => {
+                handleClaimFund();
+              }}
+              disabled={campaignInfo.status === "Ended"}
             >
               <Text mr="8px">&#128239;</Text> Claim Funds
             </Button>

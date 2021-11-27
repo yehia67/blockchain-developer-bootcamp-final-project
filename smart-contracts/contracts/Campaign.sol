@@ -89,17 +89,18 @@ contract Campaign is Context, ICampaign {
     }
 
     function refund() external isfunder {
-        campaignInfo.amountRaised -= funders[_msgSender()];
-        payable(_msgSender()).transfer(funders[_msgSender()]);
+        uint256 amount = funders[_msgSender()];
+        campaignInfo.amountRaised -= amount;
+        funders[_msgSender()] = 0;
+        payable(_msgSender()).transfer(amount);
 
         emit CampaignRefunded(_msgSender(), funders[_msgSender()]);
     }
 
     function claimFunds() external isActive isGoalAchived onlyOwner {
         campaignInfo.state = CampaignState.ENDED;
-        payable(_msgSender()).transfer(campaignInfo.amountRaised);
-
-        emit CampaignClaimed(_msgSender(), campaignInfo.amountRaised);
+        payable(campaignInfo.owner).transfer(campaignInfo.amountRaised);
+        emit CampaignClaimed(campaignInfo.owner, campaignInfo.amountRaised);
     }
 
     function getFunds() external view returns (uint256) {
