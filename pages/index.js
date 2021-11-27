@@ -31,16 +31,15 @@ export default function Home() {
     }
   }, []);
 
-  const handleGetCampaigns = React.useCallback(async (library) => {
-    const newCampaigns = await getCampaigns(library);
+  const handleGetCampaigns = React.useCallback(async () => {
+    const newCampaigns = await getCampaigns();
     setCampaigns(newCampaigns);
-    console.log({ newCampaigns });
   }, []);
 
   React.useEffect(() => {
+    handleGetCampaigns();
     if (library) {
       setProvider(library);
-      handleGetCampaigns(library);
     }
   }, [library, handleGetCampaigns]);
 
@@ -62,20 +61,23 @@ export default function Home() {
           size="xl"
         />
       ) : (
-        campaigns.slice(0).reverse().map((campaign) => (
-          <Link
-            key={`campaign/${campaign.contractAddress}`}
-            href={`campaign/${campaign.contractAddress}`}
-          >
-            <Card
-              name={campaign.info.name}
-              ipfsHash={campaign.info.ipfsHash}
-              goal={campaign.info.goal}
-              raisedAmount={campaign.info.amountRaised}
-              status={campaign.info.status}
-            />
-          </Link>
-        ))
+        campaigns
+          .slice(0)
+          .reverse()
+          .map((campaign) => (
+            <Link
+              key={`campaign/${campaign.contractAddress}`}
+              href={`campaign/${campaign.contractAddress}`}
+            >
+              <Card
+                name={campaign.info.name}
+                ipfsHash={campaign.info.ipfsHash}
+                goal={campaign.info.goal}
+                raisedAmount={campaign.info.amountRaised}
+                status={campaign.info.status}
+              />
+            </Link>
+          ))
       )}
     </Grid>
   );

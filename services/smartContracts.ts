@@ -1,4 +1,4 @@
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 import { Contract } from "@ethersproject/contracts";
 import CampaignFactory from "@artifacts/CampaignFactory.json";
 import Campaign from "@artifacts/Campaign.json";
@@ -61,16 +61,14 @@ export const getCampaignInfo = async (
   }
 };
 
-export const getCampaigns = async (library: Web3Provider) => {
+export const getCampaigns = async () => {
   try {
-    if (!library) {
-      console.log("no library found");
-      return;
-    }
+    const localProvider = new ethers.providers.AlchemyProvider("ropsten");
+
     const contract = new Contract(
       CampaignFactory.address,
       CampaignFactory.abi,
-      library
+      localProvider
     );
     const deployedCampaigns = await contract.callStatic[
       "getDeployedCampaigns"
@@ -137,6 +135,7 @@ export const fund = async (
     const funds = await contract.fund({
       value: ethers.utils.parseEther(fundAmount),
     });
+    toast.success("Transaction Pending...Check your metamask wallet");
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
@@ -165,6 +164,7 @@ export const refund = async ({
       provider.getSigner(userAddress).connectUnchecked()
     );
     const refund = await contract.refund();
+    toast.success("Transaction Pending...Check your metamask wallet");
     return refund.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
@@ -193,6 +193,7 @@ export const claimFunds = async ({
       provider.getSigner(userAddress).connectUnchecked()
     );
     const funds = await contract.claimFunds();
+    toast.success("Transaction Pending...Check your metamask wallet");
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
