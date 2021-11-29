@@ -12,24 +12,6 @@ export default function Home() {
   const [provider, setProvider] = React.useState();
   const [campaigns, setCampaigns] = React.useState([]);
 
-  const networkHandler = React.useCallback(async () => {
-    try {
-      if (!provider) {
-        console.log("provider is null");
-        return;
-      }
-      const { chainId } = await provider.getNetwork();
-      if (chainId !== 3) {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x3" }], // chainId must be in hexadecimal numbers
-        });
-      }
-    } catch (error) {
-      console.log(error);
-      return;
-    }
-  }, []);
 
   const handleGetCampaigns = React.useCallback(async () => {
     const newCampaigns = await getCampaigns();
@@ -42,12 +24,6 @@ export default function Home() {
       setProvider(library);
     }
   }, [library, handleGetCampaigns]);
-
-  React.useEffect(() => {
-    if (window && window.ethereum) {
-      networkHandler();
-    }
-  }, [provider, account, networkHandler]);
 
   return (
     <Grid templateColumns="repeat(4, 1fr)" gap={3}>

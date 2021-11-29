@@ -1,9 +1,12 @@
 import toast from "react-hot-toast";
+import { ethers } from "ethers";
 import { Contract } from "@ethersproject/contracts";
+
+import type { Web3Provider } from "@ethersproject/providers";
+
+import { networkHandler } from "./networkHandler";
 import CampaignFactory from "@artifacts/CampaignFactory.json";
 import Campaign from "@artifacts/Campaign.json";
-import type { Web3Provider } from "@ethersproject/providers";
-import { ethers } from "ethers";
 
 export interface MetamaskError {
   message: string;
@@ -91,6 +94,7 @@ export const createCampaign = async (
       console.log("no provider found");
       return;
     }
+    await networkHandler(provider);
     const contract = new Contract(
       CampaignFactory.address,
       CampaignFactory.abi,
@@ -126,6 +130,9 @@ export const fund = async (
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
@@ -157,6 +164,9 @@ export const refund = async ({
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
@@ -186,6 +196,9 @@ export const claimFunds = async ({
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
