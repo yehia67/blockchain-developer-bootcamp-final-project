@@ -77,7 +77,7 @@ describe('Campaign contract', () => {
       const balanceBefore = await ethers.provider.getBalance(addr1.address)
       expect(await CampaignContract.connect(addr1).refund())
         .to.emit(CampaignContract, 'CampaignRefunded')
-        .withArgs(addr1.address, utils.parseEther('0.06'))
+        .withArgs(addr1.address, 0)
       const balanceAfter = await ethers.provider.getBalance(addr1.address)
       expect(Number(balanceAfter.sub(balanceBefore)) > 0).to.be.true
     })

@@ -25,6 +25,13 @@ contract CampaignFactory is Ownable, ICampaignFactory {
         minGoal = _minGoal;
     }
 
+    /**
+     * @dev Creates a new campaign
+     * @param name Name of the campaign
+     * @param description Description of the campaign
+     * @param ipfsHash Hash of the campaign image
+     * @param goal Goal of the campaign
+     */
     function createCampaign(
         string memory name,
         string memory description,
@@ -36,12 +43,17 @@ contract CampaignFactory is Ownable, ICampaignFactory {
         emit CampaignDeployed(_msgSender(), address(campaign), name, description, ipfsHash, goal);
     }
 
+    /**
+     * @dev Returns all deployed campaign smart contracts addresses
+     * @return array of campaign smart contract addresses
+     */
     function getDeployedCampaigns() external view returns (Campaign[] memory) {
         return campaigns;
     }
 
     /**
-     * @dev Get the minimum goal for a campaign
+     * @dev Returns the minimum goal of a campaign
+     * @return uint256 Minimum goal of a campaign
      */
     function getMinGoal() external view returns (uint256) {
         return minGoal;
@@ -49,6 +61,7 @@ contract CampaignFactory is Ownable, ICampaignFactory {
 
     /**
      * @dev Set the minimum goal for a campaign
+     * @param _minGoal Minimum goal of a campaign
      */
     function setMinGoal(uint256 _minGoal) external onlyOwner {
         minGoal = _minGoal;
