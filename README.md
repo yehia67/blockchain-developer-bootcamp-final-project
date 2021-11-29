@@ -24,6 +24,7 @@ https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/
   - Ropston `npx hardhat run scripts/deploy.js --network ropsten`
   - Localhost `npx hardhat run scripts/deploy.js --network localhost`
 - `development` network id is 1337, remember to change it in Metamask as well!
+- You can check the smart contract deployed [documentation](https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/docs/index.html#/)
 
 ### Frontend
 
@@ -42,7 +43,8 @@ https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/
 
 ## Screencast link
 
-https://youtu.be/enwECpgoQUg
+I recommend you watch it on 2x (Ropsten transactions are slow)
+https://youtu.be/536MRde37V4
 
 ## Public Ethereum wallet for certification:
 
@@ -81,5 +83,5 @@ touch privateKey.secrete
 ## TODO features
 
 - Add a deadline for each campaign.
-- upload all campaign files (video, PDFs and images) to ipfs
-- Use pining service like [pinata](https://www.pinata.cloud/)
+- upload all campaign files (video, PDFs and images) to ipfs.
+- Use pining service like [pinata](https://www.pinata.cloud/).
