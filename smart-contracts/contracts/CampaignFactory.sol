@@ -9,6 +9,7 @@ import './interface/ICampaignFactory.sol';
 import './Campaign.sol';
 
 /**
+ * @author Yehia Tarek
  * @title Campaign
  * @dev Campaign contract
  */

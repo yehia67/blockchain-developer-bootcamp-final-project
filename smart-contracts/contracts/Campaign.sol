@@ -8,6 +8,7 @@ import '@openzeppelin/contracts/utils/Address.sol';
 import './interface/ICampaign.sol';
 
 /**
+ * @author Yehia Tarek
  * @title Campaign
  * @dev Campaign contract
  */
