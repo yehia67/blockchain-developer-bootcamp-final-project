@@ -1,34 +1,85 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Final project - Funding Campaigns Platform
 
-## Getting Started
+## Deployed version url:
 
-First, run the development server:
+https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/
 
-```bash
-npm run dev
-# or
-yarn dev
+## How to run this project locally:
+
+### Prerequisites
+
+- Node.js >= v14
+- Hardhat & (ganache/hardhat)
+- Alchemy or infura account
+- Yarn
+- `git checkout main`
+
+### Contracts
+
+- cd `smart-contracts` and run `yarn install`
+- Run local testnet in port `8454` with an Ethereum client, e.g. Ganache using `ganache-cli` or `npx hardhat node`
+- Compile smart contracts `npx hardhat compile`
+- Test smart-contracts `npx hardhat test`
+- Deploy to:
+  - Ropston `npx hardhat run scripts/deploy.js --network ropsten`
+  - Localhost `npx hardhat run scripts/deploy.js --network localhost`
+- `development` network id is 1337, remember to change it in Metamask as well!
+
+### Frontend
+
+- go to root directory
+- Add deployed address and abi to `artifacts/`
+- `yarn install`
+- `yarn dev`
+- Open `http://localhost:3000`
+
+### How to deploy project to ropsten
+
+- Go to `cd smart-contracts`
+- Create two files `touch alchemyKey.secret privateKey.secret`
+- Ropston `npx hardhat run scripts/deploy.js --network ropsten`
+- Make sure to have some [faucet](https://faucet.ropsten.be/)
+
+## Screencast link
+
+https://youtu.be/enwECpgoQUg
+
+## Public Ethereum wallet for certification:
+
+`0x17156c0cf9701b09114CB3619D9f3fD937caA3A8`
+
+## Project description
+
+A funding platform for campaign creators to create campaigns and collect funds.
+
+## Simple workflow
+
+1. User add his campaign idea: name, description, media image (uploaded to IPFS). Campaign must request funds at least `0.02 ETH`
+2. See your project and other projects.
+3. Select any project.
+4. Fund any project
+5. Refund your ETH if you want. See returned funds in the header or your metamask wallet (Gas fees will be deducted)
+6. If you achieved your fund goal `Claim Fund` button will appear and you can claim funds and see your balance updated on the header and your metamask wallet
+
+## Directory structure
+
+- `root directory`: Project's Next frontend.
+- `artifacts`: Abi and Smart contract addresses
+- `smart-contracts`: Smart contracts that are deployed in the Ropsten testnet.
+- `smart-contracts/scripts`: deployment scripts
+- `smart-contracts/test`: Tests for smart contracts.
+
+## Environment variables (not needed for running project locally)
+
+We don't use `.env` but we use two `.secrete` files
+
+```
+touch alchemyKey.secret
+touch privateKey.secrete
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## TODO features
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+- Add a deadline for each campaign.
+- upload all campaign files (video, PDFs and images) to ipfs
+- Use pining service like [pinata](https://www.pinata.cloud/)
