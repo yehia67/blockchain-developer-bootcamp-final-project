@@ -1,4 +1,5 @@
 import '@nomiclabs/hardhat-waffle'
+import 'hardhat-docgen'
 
 const fs = require('fs')
 const privateKey = fs.readFileSync('privateKey.secret').toString().trim()
@@ -14,7 +15,7 @@ module.exports = {
       saveDeployments: true,
     },
     ropsten: {
-      url: `https://ropsten.infura.io/v3/1fa4dd79b55243c3b6b9d40d8ef52ae2`,
+      url: `https://eth-ropsten.alchemyapi.io/v2/${alchemyKey}`,
       saveDeployments: true,
       accounts: [privateKey],
       gasPrice: 8000000000,
@@ -25,5 +26,10 @@ module.exports = {
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',
+  },
+  docgen: {
+    path: './docs',
+    clear: true,
+    runOnCompile: true,
   },
 }

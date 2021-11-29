@@ -11,7 +11,10 @@ import {
   NumberInputField,
   NumberInputStepper,
   Spinner,
+  Stack,
+  Badge,
 } from "@chakra-ui/react";
+import toast from "react-hot-toast";
 import Img from "next/image";
 import { useEthers } from "@usedapp/core";
 import type { Web3Provider } from "@ethersproject/providers";
@@ -53,10 +56,12 @@ function Campaign({
   const { library, account } = useEthers();
   const [campaignInfo, setCampaignInfo] =
     React.useState<CampaignState | null>();
-  console.log({ campaignInfo });
+
   const [fundAmount, setFundAmount] = React.useState("0");
   const [transactionHash, setTransactionHash] = React.useState("");
   const [currentUserFunding, setCurrentUserFunding] = React.useState(0);
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleUserCurrentFunding = async () => {
     if (!account || !library) {
       return;
@@ -66,32 +71,36 @@ function Campaign({
       provider: library,
       contractAddress,
     });
-    console.log("userFunding", userFunding);
-    if (userFunding) {
+    if (userFunding || userFunding === 0) {
       setCurrentUserFunding(userFunding);
     }
   };
+
   React.useEffect(() => {
     setCampaignInfo({ raisedAmount, status });
   }, [raisedAmount, status]);
+
   React.useEffect(() => {
     handleUserCurrentFunding();
   }, [account, library]);
-  console.log("goal", { goal });
+
   React.useEffect(() => {
     const updateCampaignInfo = async () => {
       if (transactionHash && transactionHash.length > 0 && library) {
         // wait for transaction to confirm
         await library.waitForTransaction(transactionHash);
-        handleUserCurrentFunding();
+        await handleUserCurrentFunding();
         const newCampaignInfo = await getCampaignInfo(contractAddress);
         if (!newCampaignInfo) {
+          setIsLoading(false);
           return;
         }
+        setIsLoading(false);
         setCampaignInfo({
           raisedAmount: newCampaignInfo.info.amountRaised,
           status: newCampaignInfo.info.status,
         });
+        toast.success("Transaction confirmed!");
       }
     };
     updateCampaignInfo();
@@ -99,28 +108,53 @@ function Campaign({
 
   const handleFund = async () => {
     if (!account || !library) {
+      toast.error("Connect To Metamask Please");
       return;
     }
+    setIsLoading(true);
     const hash = await fund(fundAmount, {
       userAddress: account as string,
       provider: library as Web3Provider,
       contractAddress,
     });
+    if (!hash) {
+      setIsLoading(false);
+    }
+    setTransactionHash(hash);
+  };
+  const handleClaimFund = async () => {
+    if (!account || !library) {
+      toast.error("Connect To Metamask Please");
+      return;
+    }
+    setIsLoading(true);
+    const hash = await claimFunds({
+      userAddress: account as string,
+      provider: library as Web3Provider,
+      contractAddress,
+    });
+    if (!hash) {
+      setIsLoading(false);
+    }
     setTransactionHash(hash);
   };
 
   const handleRefund = async () => {
     if (!account || !library) {
+      toast.error("Connect To Metamask Please");
       return;
     }
+    setIsLoading(true);
     const hash = await refund({
       userAddress: account as string,
       provider: library as Web3Provider,
       contractAddress,
     });
+    if (!hash) {
+      setIsLoading(false);
+    }
     setTransactionHash(hash);
   };
-  console.log("currentUserFunding", { currentUserFunding });
 
   return campaignInfo ? (
     <Flex
@@ -139,6 +173,21 @@ function Campaign({
         >
           {name}
         </Heading>
+        <Stack direction="row" spacing="1.5rem" margin="1rem">
+          {campaignInfo.status === "Funding" && (
+            <Badge colorScheme="green">Active</Badge>
+          )}
+          {campaignInfo.status === "Ended" && (
+            <Badge colorScheme="purple">Campaign Ended</Badge>
+          )}
+          {owner === account && (
+            <Badge colorScheme="red">Your Own This Campaign</Badge>
+          )}
+          <Badge colorScheme="blue">
+            {campaignInfo.raisedAmount} ETH Raised
+          </Badge>
+          <Badge colorScheme="purple"> {goal} ETH Campaign Goal </Badge>
+        </Stack>
         <Text
           fontSize={["1rem", "1rem", "1.2rem", "1.3rem"]}
           marginBottom="2.5rem"
@@ -147,7 +196,7 @@ function Campaign({
         >
           {description}
         </Text>
-        <Box display="flex" p={1} alignItems="center">
+        <Box display="flex" p={1} m={1} alignItems="center">
           {campaignInfo.status === "Ended" ? (
             <Text>Campaign Ended</Text>
           ) : (
@@ -158,21 +207,27 @@ function Campaign({
             />
           )}
         </Box>
-        <Box display="flex" p={1} alignItems="center">
-          <NumberInput
-            defaultValue={fundAmount}
-            min={0}
-            onChange={(valueAsString: string, valueAsNumber: number) =>
-              setFundAmount(valueAsString)
-            }
-          >
-            <NumberInputField />
-            <NumberInputStepper>
-              <NumberIncrementStepper />
-              <NumberDecrementStepper />
-            </NumberInputStepper>
-          </NumberInput>
-        </Box>
+
+        {campaignInfo.status !== "Ended" && (
+          <Box display="flex" p={1} alignItems="center">
+            <Text m={1} p={1}>
+              Amount You Want To Fund
+            </Text>
+            <NumberInput
+              defaultValue={fundAmount}
+              min={0}
+              onChange={(valueAsString: string, valueAsNumber: number) =>
+                setFundAmount(valueAsString)
+              }
+            >
+              <NumberInputField />
+              <NumberInputStepper>
+                <NumberIncrementStepper />
+                <NumberDecrementStepper />
+              </NumberInputStepper>
+            </NumberInput>
+          </Box>
+        )}
         <Box m={1} flexDirection={["column", "column", "row", "row"]} d="flex">
           <Button
             m={1}
@@ -184,7 +239,9 @@ function Campaign({
               color: "white",
             }}
             onClick={() => handleRefund()}
-            disabled={status === "Ended"}
+            disabled={
+              campaignInfo.status === "Ended" || currentUserFunding === 0
+            }
           >
             <Text mr="8px">&#9889;</Text>
             Refund
@@ -199,39 +256,39 @@ function Campaign({
               color: "white",
             }}
             onClick={() => handleFund()}
-            disabled={status === "Ended"}
+            disabled={campaignInfo.status === "Ended"}
           >
             <Text mr="8px">&#128239;</Text> Fund
           </Button>
-          <Button
-            m={1}
-            padding="30px 30px"
-            fontWeight="600"
-            fontSize={["15px", "16px", "16px", "18px"]}
-            _hover={{
-              backgroundColor: "orange.500",
-              color: "white",
-            }}
-            onClick={() =>
-              claimFunds({
-                userAddress: account as string,
-                provider: library as Web3Provider,
-                contractAddress,
-              })
-            }
-            disabled={owner !== account || status === "Ended"}
-          >
-            <Text mr="8px">&#128239;</Text> Claim Funds
-          </Button>
+          {owner === account && (
+            <Button
+              m={1}
+              padding="30px 30px"
+              fontWeight="600"
+              fontSize={["15px", "16px", "16px", "18px"]}
+              _hover={{
+                backgroundColor: "orange.500",
+                color: "white",
+              }}
+              onClick={() => {
+                handleClaimFund();
+              }}
+              disabled={campaignInfo.status === "Ended"}
+            >
+              <Text mr="8px">&#128239;</Text> Claim Funds
+            </Button>
+          )}
+          {isLoading && <Spinner m={5} />}
         </Box>
       </Box>
+
       <Box p={5}>
         <Img
           className={styles.image}
           src={`https://ipfs.io/ipfs/${ipfsHash}`}
           alt="Image of funded project"
-          width="100%"
-          height="100%"
+          width="700px"
+          height="500px"
         />
       </Box>
     </Flex>

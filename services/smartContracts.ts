@@ -1,9 +1,12 @@
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
+import { ethers } from "ethers";
 import { Contract } from "@ethersproject/contracts";
+
+import type { Web3Provider } from "@ethersproject/providers";
+
+import { networkHandler } from "./networkHandler";
 import CampaignFactory from "@artifacts/CampaignFactory.json";
 import Campaign from "@artifacts/Campaign.json";
-import type { Web3Provider } from "@ethersproject/providers";
-import { ethers } from "ethers";
 
 export interface MetamaskError {
   message: string;
@@ -56,21 +59,18 @@ export const getCampaignInfo = async (
       },
     };
   } catch (error) {
-    console.log("the error here");
-    console.log(error);
+    console.error(error);
   }
 };
 
-export const getCampaigns = async (library: Web3Provider) => {
+export const getCampaigns = async () => {
   try {
-    if (!library) {
-      console.log("no library found");
-      return;
-    }
+    const localProvider = new ethers.providers.AlchemyProvider("ropsten");
+
     const contract = new Contract(
       CampaignFactory.address,
       CampaignFactory.abi,
-      library
+      localProvider
     );
     const deployedCampaigns = await contract.callStatic[
       "getDeployedCampaigns"
@@ -94,6 +94,7 @@ export const createCampaign = async (
       console.log("no provider found");
       return;
     }
+    await networkHandler(provider);
     const contract = new Contract(
       CampaignFactory.address,
       CampaignFactory.abi,
@@ -129,6 +130,9 @@ export const fund = async (
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
@@ -137,13 +141,14 @@ export const fund = async (
     const funds = await contract.fund({
       value: ethers.utils.parseEther(fundAmount),
     });
+    toast.success("Transaction Pending...Check your metamask wallet");
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -159,19 +164,23 @@ export const refund = async ({
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
       provider.getSigner(userAddress).connectUnchecked()
     );
     const refund = await contract.refund();
+    toast.success("Transaction Pending...Check your metamask wallet");
     return refund.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -187,19 +196,23 @@ export const claimFunds = async ({
       console.log("no provider found");
       return;
     }
+
+    await networkHandler(provider);
+
     const contract = new Contract(
       contractAddress,
       Campaign.abi,
       provider.getSigner(userAddress).connectUnchecked()
     );
     const funds = await contract.claimFunds();
+    toast.success("Transaction Pending...Check your metamask wallet");
     return funds.hash;
   } catch (error) {
     if ((error as MetamaskError).message.includes("revert")) {
-      console.error("transaction reverted");
+      toast.error("transaction reverted");
     }
     if ((error as MetamaskError).code === 4001) {
-      console.error("transaction rejected");
+      toast.error("transaction rejected");
     }
     console.error(error);
   }
@@ -216,7 +229,7 @@ export const getUserFundsAmount = async ({
       return;
     }
     const contract = new Contract(contractAddress, Campaign.abi, provider);
-    const funds = await contract.getFunds();
+    const funds = await contract.connect(userAddress).getFunds();
     return Number(ethers.utils.formatEther(funds.toString()));
   } catch (error) {
     console.error(error);

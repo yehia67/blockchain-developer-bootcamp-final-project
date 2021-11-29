@@ -1,6 +1,6 @@
 {
   "contractName": "Campaign",
-  "abi": [
+    "abi": [
     {
       "inputs": [
         {

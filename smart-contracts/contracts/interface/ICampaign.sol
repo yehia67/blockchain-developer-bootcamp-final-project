@@ -37,4 +37,6 @@ interface ICampaign {
     event CampaignFunded(address indexed funder, uint256 amount);
     event CampaignRefunded(address indexed refunder, uint256 amount);
     event CampaignClaimed(address indexed owner, uint256 amount);
+
+    function getFunds() external view returns (uint256);
 }

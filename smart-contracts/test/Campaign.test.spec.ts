@@ -65,7 +65,6 @@ describe('Campaign contract', () => {
     })
 
     it(`Should get the funded amount`, async () => {
-      const test = await await CampaignContract.connect(addr1).getFunds()
       expect(await CampaignContract.connect(addr1).getFunds()).to.equal(utils.parseEther('0.06'))
     })
 
@@ -74,11 +73,11 @@ describe('Campaign contract', () => {
         'REVERT: The amount of wei should be more than zero'
       )
     })
-    it(`Should refund all campaign funds`, async () => {
+    it(`Should refund campaign funds`, async () => {
       const balanceBefore = await ethers.provider.getBalance(addr1.address)
       expect(await CampaignContract.connect(addr1).refund())
         .to.emit(CampaignContract, 'CampaignRefunded')
-        .withArgs(addr1.address, utils.parseEther('0.06'))
+        .withArgs(addr1.address, 0)
       const balanceAfter = await ethers.provider.getBalance(addr1.address)
       expect(Number(balanceAfter.sub(balanceBefore)) > 0).to.be.true
     })
