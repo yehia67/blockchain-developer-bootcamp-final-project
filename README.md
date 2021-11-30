@@ -10,7 +10,7 @@ https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/
 
 - Node.js >= v14
 - Hardhat & (ganache/hardhat)
-- Alchemy or infura account
+- Alchemy or Infura account
 - Yarn
 - `git checkout main`
 
@@ -28,13 +28,13 @@ https://blockchain-developer-bootcamp-final-project-khaki.vercel.app/
 
 ### Frontend
 
-- go to root directory
+- go to the root directory
 - Add deployed address and abi to `artifacts/`
 - `yarn install`
 - `yarn dev`
 - Open `http://localhost:3000`
 
-### How to deploy project to ropsten
+### How to deploy the project to Ropsten
 
 - Go to `cd smart-contracts`
 - Create two files `touch alchemyKey.secret privateKey.secret`
@@ -52,16 +52,16 @@ https://youtu.be/536MRde37V4
 
 ## Project description
 
-A funding platform for campaign creators to create campaigns and collect funds.
+A funding platform for campaign creators to create campaigns and collect funds. Campaign creators can develop campaigns with a specific goal when the goal is reached or passed to claim all funds.  Funders can fund/refund any campaigns.
 
 ## Simple workflow
 
-1. User add his campaign idea: name, description, media image (uploaded to IPFS). Campaign must request funds at least `0.02 ETH`
+1. User adds his campaign idea: name, description, media image (uploaded to IPFS). The campaign must request funds of at least `0.02 ETH.` (Can be changed by the owner of the campaign factory)
 2. See your project and other projects.
 3. Select any project.
 4. Fund any project
 5. Refund your ETH if you want. See returned funds in the header or your metamask wallet (Gas fees will be deducted)
-6. If you achieved your fund goal `Claim Fund` button will appear and you can claim funds and see your balance updated on the header and your metamask wallet
+6. If you achieved your fund goal `Claim Fund` button will appear, and you can claim funds and see your balance updated on the header and your Metamask wallet
 
 ## Directory structure
 
@@ -71,7 +71,7 @@ A funding platform for campaign creators to create campaigns and collect funds.
 - `smart-contracts/scripts`: deployment scripts
 - `smart-contracts/test`: Tests for smart contracts.
 
-## Environment variables (not needed for running project locally)
+## Environment variables (not needed for the running project locally)
 
 We don't use `.env` but we use two `.secrete` files
 
@@ -83,5 +83,6 @@ touch privateKey.secrete
 ## TODO features
 
 - Add a deadline for each campaign.
-- upload all campaign files (video, PDFs and images) to ipfs.
+- Make a campaign fail if the deadline passes.
+- upload all campaign files (video, PDFs, and images) to IPFS.
 - Use pining service like [pinata](https://www.pinata.cloud/).
