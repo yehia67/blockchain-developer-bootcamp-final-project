@@ -27,7 +27,7 @@ jobs:
         node-version: ${{ matrix.node-version }}
         cache: 'yarn'
     - run: cd smart-contracts
-    - run: yarn
-    - run: yarn global add hardhat
-    - run: hardhat compile
-    - run: hardhat test
+    - run: npm install
+    - run: npm install -g hardhat
+    - run: npx hardhat compile
+    - run: npx hardhat test
