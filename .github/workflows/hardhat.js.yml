@@ -28,5 +28,6 @@ jobs:
         cache: 'yarn'
     - run: cd smart-contracts
     - run: yarn
-    - run: npx hardhat compile
-    - run: npx hardhat test
+    - run: yarn global add hardhat
+    - run: hardhat compile
+    - run: hardhat test
