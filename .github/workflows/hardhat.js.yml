@@ -29,5 +29,6 @@ jobs:
     - run: cd smart-contracts
     - run: npm install
     - run: npm install -g hardhat
+    - run: npm install --save-dev hardha
     - run: hardhat compile
     - run: hardhat test
