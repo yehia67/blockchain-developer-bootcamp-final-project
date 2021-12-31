@@ -30,5 +30,5 @@ jobs:
     - run: npm install
     - run: npm install -g hardhat
     - run: npm install --save-dev hardhat
-    - run: hardhat compile
-    - run: hardhat test
+    - run: npx hardhat compile
+    - run: npx hardhat test
